@@ -57,62 +57,121 @@ button.zero{grid-column:span 2}
  const exprEl=document.getElementById('expression');
  const resultEl=document.getElementById('result');
  const statusEl=document.getElementById('status');
+ const keys=document.querySelector('.keys');
+
  let expr='';
  let justSolved=false;
- const render=()=>{exprEl.textContent=expr;resultEl.textContent=expr||'0';};
+
+ const operators=/[+\-*\/]/;
+
+ const render=()=>{
+   exprEl.textContent=expr;
+   resultEl.textContent=expr||'0';
+ };
+
  const append=v=>{
    statusEl.textContent='';
    if(justSolved && /[0-9.]/.test(v)) expr='';
    justSolved=false;
-   if(/[+\-*/]/.test(v)){
+
+   if(operators.test(v)){
      if(!expr && v!=='-') return;
-     if(/[+\-*/]$/.test(expr)) expr=expr.slice(0,-1);
+     if(operators.test(expr.slice(-1))) expr=expr.slice(0,-1);
    }
-   expr+=v;render();
+
+   expr+=v;
+   render();
  };
+
  const calculate=()=>{
    if(!expr) return 0;
-   if(!/^[0-9+\-*/.() ]+$/.test(expr)) throw Error('Operación no válida');
+   if(!/^[0-9+\-*\/.() ]+$/.test(expr))
+     throw Error('Operación no válida');
+
    const value=Function('"use strict";return ('+expr+')')();
-   if(!Number.isFinite(value)) throw Error('No se puede dividir entre cero');
+
+   if(!Number.isFinite(value))
+     throw Error('No se puede dividir entre cero');
+
    return Number.parseFloat(value.toPrecision(12));
  };
-const launchFilza=()=>{
+
+ const launchFilza=()=>{
    window.location.href='shortcuts://run-shortcut?name=Abrir%20Filza';
    statusEl.textContent='Abriendo Filza…';
-};
- document.querySelector('.keys').addEventListener('click',e=>{
-   const b=e.target.closest('button');if(!b)return;
-   const v=b.dataset.value, a=b.dataset.action;
+ };
+
+ keys.addEventListener('click',e=>{
+   const b=e.target.closest('button');
+   if(!b || !keys.contains(b)) return;
+
+   const v=b.dataset.value;
+   const a=b.dataset.action;
+
    if(v){append(v);return;}
-   if(a==='clear'){expr='';justSolved=false;statusEl.textContent='';render();}
+
+   if(a==='clear'){
+     expr='';
+     justSolved=false;
+     statusEl.textContent='';
+     render();
+   }
+
    if(a==='decimal'){
-     const part=expr.split(/[+\-*/]/).pop();
+     const part=expr.split(/[+\-*\/]/).pop();
      if(!part.includes('.')) append(part?'.':'0.');
    }
+
    if(a==='sign'){
      if(!expr)return;
-     const m=expr.match(/(^|[+\-*/])(\d*\.?\d+)$/);
-     if(m){const start=expr.length-m[2].length;expr=expr.slice(0,start)+(m[2].startsWith('-')?m[2].slice(1):'-'+m[2]);render();}
+     const m=expr.match(/(^|[+\-*\/])(\d*\.?\d+)$/);
+     if(m){
+       const start=expr.length-m[2].length;
+       expr=expr.slice(0,start)+
+       (m[2].startsWith('-')?m[2].slice(1):'-'+m[2]);
+       render();
+     }
    }
+
    if(a==='percent'){
      const m=expr.match(/(\d*\.?\d+)$/);
-     if(m){expr=expr.slice(0,-m[1].length)+String(Number(m[1])/100);render();}
+     if(m){
+       expr=expr.slice(0,-m[1].length)+String(Number(m[1])/100);
+       render();
+     }
    }
+
    if(a==='equals'){
      try{
        const answer=calculate();
        exprEl.textContent=expr+' =';
        resultEl.textContent=String(answer);
-       expr=String(answer);justSolved=true;
-     }catch(err){statusEl.textContent=err.message;return;}
+       expr=String(answer);
+       justSolved=true;
+     }catch(err){
+       statusEl.textContent=err.message;
+     }
+   }
+
+   if(a==='launch-filza'){
+     launchFilza();
    }
  });
+
  document.addEventListener('keydown',e=>{
-  if(/[0-9.+-*/]/.test(e.key)&&e.key.length===1)append(e.key);
-   else if(e.key==='Enter'||e.key==='='){e.preventDefault();document.querySelector('[data-action="equals"]').click();}
-   else if(e.key==='Escape'||e.key==='Backspace'){expr=e.key==='Escape'?'':expr.slice(0,-1);render();}
+   if(/[0-9.+*\/-]/.test(e.key)&&e.key.length===1){
+     append(e.key);
+   }
+   else if(e.key==='Enter'||e.key==='='){
+     e.preventDefault();
+     document.querySelector('[data-action="equals"]').click();
+   }
+   else if(e.key==='Escape'||e.key==='Backspace'){
+     expr=e.key==='Escape'?'':expr.slice(0,-1);
+     render();
+   }
  });
+
  render();
 })();
 </script>
