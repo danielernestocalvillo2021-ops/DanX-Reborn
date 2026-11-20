@@ -110,7 +110,7 @@ const launchFilza=()=>{
    }
  });
  document.addEventListener('keydown',e=>{
-   if(/[0-9.+\-*/]/.test(e.key)&&e.key.length===1)append(e.key);
+  if(/[0-9.+-*/]/.test(e.key)&&e.key.length===1)append(e.key);
    else if(e.key==='Enter'||e.key==='='){e.preventDefault();document.querySelector('[data-action="equals"]').click();}
    else if(e.key==='Escape'||e.key==='Backspace'){expr=e.key==='Escape'?'':expr.slice(0,-1);render();}
  });
