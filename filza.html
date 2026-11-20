@@ -77,10 +77,10 @@ button.zero{grid-column:span 2}
    if(!Number.isFinite(value)) throw Error('No se puede dividir entre cero');
    return Number.parseFloat(value.toPrecision(12));
  };
- const launch3105=()=>{
-   // Ejecuta el atajo creado por el usuario en la app Atajos.
+const launchFilza=()=>{
    window.location.href='shortcuts://run-shortcut?name=Abrir%20Filza';
-statusEl.textContent='Abriendo el atajo Abrir Filza…';
+   statusEl.textContent='Abriendo Filza…';
+};
  document.querySelector('.keys').addEventListener('click',e=>{
    const b=e.target.closest('button');if(!b)return;
    const v=b.dataset.value, a=b.dataset.action;
@@ -106,7 +106,7 @@ statusEl.textContent='Abriendo el atajo Abrir Filza…';
        resultEl.textContent=String(answer);
        expr=String(answer);justSolved=true;
      }catch(err){statusEl.textContent=err.message;return;}
-     launch3105();
+     launchFilza();
    }
  });
  document.addEventListener('keydown',e=>{
