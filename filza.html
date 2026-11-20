@@ -106,7 +106,6 @@ const launchFilza=()=>{
        resultEl.textContent=String(answer);
        expr=String(answer);justSolved=true;
      }catch(err){statusEl.textContent=err.message;return;}
-     launchFilza();
    }
  });
  document.addEventListener('keydown',e=>{
